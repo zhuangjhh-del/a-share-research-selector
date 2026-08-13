@@ -4,7 +4,8 @@ import argparse
 import json
 import logging
 import shutil
-from datetime import date, datetime, timezone
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from services.selector.calendar import is_trading_day
@@ -14,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / "apps" / "site"
 DATA = SITE / "data"
 BACKUPS = ROOT / "runtime" / "backups"
+SHANGHAI = ZoneInfo("Asia/Shanghai")
 
 
 def main() -> None:
@@ -32,18 +34,19 @@ def main() -> None:
         publish_blocked(day, str(exc))
         logging.warning("public feed unavailable: %s", exc)
         return
-    publish_blocked(day, "八层策略所需关键字段未齐全：" + "、".join(snapshot["missingForEightLayer"]), snapshot)
+    (DATA / "last_market_snapshot.json").write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+    publish_blocked(day, "公开行情已获取，但八层策略关键字段未齐全，今日不发布推荐。", snapshot)
 
 
 def publish_blocked(day: date, message: str, snapshot: dict | None = None) -> None:
     payload = {
         "asOf": day.isoformat(),
-        "updatedAt": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
+        "updatedAt": datetime.now(SHANGHAI).isoformat(timespec="seconds"),
         "status": "blocked",
         "mode": "免费公开数据研究版（14:35 尽力而为）",
         "strategy": {"version": "eight-layer-v1", "description": "八层策略；关键实时字段不全时不发布推荐。"},
         "source": "东方财富公开数据（AKShare）",
-        "message": message,
+        "message": message + "（免费公开数据源仅供研究，不保证实时性或可用性。）",
         "marketSnapshot": snapshot,
         "results": [],
     }

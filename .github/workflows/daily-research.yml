@@ -3,7 +3,7 @@ name: Daily post-market research
 on:
   schedule:
     # 14:35 Asia/Shanghai = 06:35 UTC；实时数据源缺失时安全停机。
-    - cron: '35 6 * * 1-5'
+    - cron: '35,38,41 6 * * 1-5'
   workflow_dispatch:
     inputs:
       as_of:

@@ -6,6 +6,7 @@ right, so only derived research output is published and source failures block ru
 from __future__ import annotations
 
 from datetime import datetime
+from time import sleep
 
 
 class PublicFeedUnavailable(RuntimeError):
@@ -13,12 +14,19 @@ class PublicFeedUnavailable(RuntimeError):
 
 
 def fetch_market_snapshot() -> dict:
-    try:
-        import akshare as ak
-        quotes = ak.stock_zh_a_spot_em()
-        indices = ak.stock_zh_index_spot_em(symbol="沪深重要指数")
-    except Exception as exc:  # upstream pages, schemas, rate limits, or package errors
-        raise PublicFeedUnavailable(f"东方财富公开数据不可用：{exc}") from exc
+    # Public sources are often transiently rate-limited. Retry here rather than
+    # publishing an upstream exception to the website.
+    quotes = indices = None
+    for attempt in range(4):
+        try:
+            import akshare as ak
+            quotes = ak.stock_zh_a_spot_em()
+            indices = ak.stock_zh_index_spot_em(symbol="沪深重要指数")
+            break
+        except Exception:
+            if attempt == 3:
+                raise PublicFeedUnavailable("东方财富公开数据暂时无法连接；已自动重试 4 次")
+            sleep(2 ** attempt)
     required = {"代码", "名称", "最新价", "涨跌幅", "成交额", "量比", "换手率", "总市值", "市盈率-动态", "振幅"}
     missing = required - set(quotes.columns)
     if missing or quotes.empty:

@@ -1,6 +1,6 @@
 {
   "asOf": "2026-08-13",
-  "updatedAt": "2026-08-13T20:26:39+08:00",
+  "updatedAt": "2026-08-13T20:29:51+08:00",
   "status": "blocked",
   "mode": "免费多源公开数据研究版",
   "strategy": {
@@ -8,7 +8,7 @@
     "description": "八层策略；关键实时字段不全时不发布推荐。"
   },
   "source": "免费多源公开数据",
-  "message": "公开行情缺少基础筛选字段",
+  "message": "新浪与东方财富公开行情均暂时不可用",
   "marketSnapshot": null,
   "results": []
 }

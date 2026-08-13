@@ -1,7 +1,8 @@
 [
   {
     "asOf": "2026-08-13",
-    "count": 2,
-    "strategyVersion": "demo-v1"
+    "count": 0,
+    "strategyVersion": "eight-layer-v1",
+    "status": "blocked"
   }
 ]

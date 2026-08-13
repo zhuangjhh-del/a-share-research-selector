@@ -1,33 +1,14 @@
 {
   "asOf": "2026-08-13",
-  "updatedAt": "2026-08-13T17:39:58+08:00",
-  "status": "success",
-  "mode": "免费研究版（盘后数据）",
+  "updatedAt": "2026-08-13T19:54:09+08:00",
+  "status": "blocked",
+  "mode": "Tushare 数据模式（待验证权限）",
   "strategy": {
-    "version": "demo-v1",
-    "description": "排除 ST、停牌和上市不足 60 日标的；要求 5 日均线高于 20 日均线、收盘价高于 5 日均线、成交额不少于 1 亿元。"
+    "version": "eight-layer-v1",
+    "description": "八层策略；关键实时字段不全时不发布推荐。"
   },
-  "source": "演示快照",
-  "results": [
-    {
-      "code": "000001",
-      "name": "平安银行",
-      "score": 35.57,
-      "reasons": [
-        "MA5 高于 MA20",
-        "收盘价高于 MA5",
-        "成交额不少于 1 亿元"
-      ]
-    },
-    {
-      "code": "600000",
-      "name": "浦发银行",
-      "score": 31.26,
-      "reasons": [
-        "MA5 高于 MA20",
-        "收盘价高于 MA5",
-        "成交额不少于 1 亿元"
-      ]
-    }
-  ]
+  "source": "Tushare API",
+  "message": "Tushare 连接或账户权限不可用",
+  "marketSnapshot": null,
+  "results": []
 }

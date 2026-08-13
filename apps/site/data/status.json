@@ -1,5 +1,5 @@
 {
   "asOf": "2026-08-13",
-  "status": "success",
-  "message": "完成：2 只入选"
+  "status": "blocked",
+  "message": "Tushare 连接或账户权限不可用"
 }

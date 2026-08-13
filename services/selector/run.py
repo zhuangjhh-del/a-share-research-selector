@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from services.selector.calendar import is_trading_day
-from services.selector.providers.tushare import TushareNotConfigured, fetch_tushare_snapshot
+from services.selector.providers.multisource_public import MultiSourceUnavailable, fetch_candidates
 
 ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / "apps" / "site"
@@ -29,13 +29,12 @@ def main() -> None:
         write_status(day, "skipped", "非交易日，不执行盘后选股")
         return
     try:
-        snapshot = fetch_tushare_snapshot()
-    except TushareNotConfigured as exc:
+        snapshot, selections = fetch_candidates()
+    except MultiSourceUnavailable as exc:
         publish_blocked(day, str(exc))
-        logging.warning("Tushare unavailable: %s", exc)
+        logging.warning("multi-source unavailable: %s", exc)
         return
-    (DATA / "last_tushare_snapshot.json").write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
-    publish_blocked(day, "Tushare 已连通；当前账户权限尚未验证八层策略所需盘中字段，今日不发布推荐。", snapshot)
+    publish_partial(day, snapshot, selections)
 
 
 def publish_blocked(day: date, message: str, snapshot: dict | None = None) -> None:
@@ -43,9 +42,9 @@ def publish_blocked(day: date, message: str, snapshot: dict | None = None) -> No
         "asOf": day.isoformat(),
         "updatedAt": datetime.now(SHANGHAI).isoformat(timespec="seconds"),
         "status": "blocked",
-        "mode": "Tushare 数据模式（待验证权限）",
+        "mode": "免费多源公开数据研究版",
         "strategy": {"version": "eight-layer-v1", "description": "八层策略；关键实时字段不全时不发布推荐。"},
-        "source": "Tushare API",
+        "source": "免费多源公开数据",
         "message": message,
         "marketSnapshot": snapshot,
         "results": [],
@@ -60,6 +59,12 @@ def publish_blocked(day: date, message: str, snapshot: dict | None = None) -> No
     BACKUPS.mkdir(parents=True, exist_ok=True)
     shutil.copy2(output, BACKUPS / f"selection-{day.isoformat()}.json")
     write_status(day, "blocked", message)
+
+def publish_partial(day: date, snapshot: dict, selections: list[dict]) -> None:
+    payload={"asOf":day.isoformat(),"updatedAt":datetime.now(SHANGHAI).isoformat(timespec="seconds"),"status":"partial","mode":"免费多源公开数据研究版","strategy":{"version":"multi-source-basic-v1","description":"已验证基础行情与流动性过滤；板块持续性、资金流、解禁与技术共振待数据可用后纳入。"},"source":"、".join(snapshot["sources"]),"message":"已生成基础多源候选；不是完整八层策略结果。","marketSnapshot":snapshot,"results":selections}
+    output=DATA/"latest.json"; output.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
+    history=DATA/"history.json"; records=json.loads(history.read_text(encoding="utf-8")) if history.exists() else []; records=[r for r in records if r.get("asOf")!=day.isoformat()]; records.insert(0,{"asOf":day.isoformat(),"count":len(selections),"strategyVersion":"multi-source-basic-v1","status":"partial"}); history.write_text(json.dumps(records[:365],ensure_ascii=False,indent=2),encoding="utf-8")
+    write_status(day,"partial",f"基础多源候选：{len(selections)} 只")
 
 
 def write_status(day: date, status: str, message: str) -> None:

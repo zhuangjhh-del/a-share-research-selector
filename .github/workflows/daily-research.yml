@@ -1,0 +1,49 @@
+name: Daily post-market research
+
+on:
+  schedule:
+    # 15:40 Asia/Shanghai = 07:40 UTC；盘后数据未就绪时在任务内重试。
+    - cron: '40 7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      as_of:
+        description: 'YYYY-MM-DD（留空表示当天）'
+        required: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily-research
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Generate results with retries
+        env:
+          MARKET_DATA_URL: ${{ secrets.MARKET_DATA_URL }}
+        run: |
+          for attempt in 1 2 3; do
+            python -m services.selector.run ${{ inputs.as_of && format('--as-of {0}', inputs.as_of) || '' }} && break
+            test "$attempt" = 3 && exit 1
+            sleep $((attempt * 120))
+          done
+      - name: Commit generated result
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/site/data
+          git diff --cached --quiet || git commit -m "data: update research result"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: apps/site }
+      - id: deployment
+        uses: actions/deploy-pages@v4

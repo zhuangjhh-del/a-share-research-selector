@@ -1,5 +1,5 @@
 {
   "asOf": "2026-08-13",
   "status": "blocked",
-  "message": "Tushare 连接或账户权限不可用"
+  "message": "Tushare 基础接口调用失败（Exception）"
 }

@@ -1,6 +1,6 @@
 {
   "asOf": "2026-08-13",
-  "updatedAt": "2026-08-13T19:55:54+08:00",
+  "updatedAt": "2026-08-13T19:58:26+08:00",
   "status": "blocked",
   "mode": "Tushare 数据模式（待验证权限）",
   "strategy": {
@@ -8,7 +8,7 @@
     "description": "八层策略；关键实时字段不全时不发布推荐。"
   },
   "source": "Tushare API",
-  "message": "Tushare 连接或账户权限不可用",
+  "message": "Tushare 基础接口调用失败（Exception）",
   "marketSnapshot": null,
   "results": []
 }

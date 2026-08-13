@@ -14,10 +14,12 @@ def fetch_candidates() -> tuple[dict, list[dict]]:
         import akshare as ak
     except Exception as exc: raise MultiSourceUnavailable("免费数据组件未安装") from exc
     sources=[]; quotes=None
+    required_names=("代码","名称","涨跌幅","成交额","换手率","总市值","最高","最低","最新价")
     for source, call in [("新浪财经", ak.stock_zh_a_spot), ("东方财富", ak.stock_zh_a_spot_em)]:
         try:
-            quotes=call(); sources.append(source)
-            if quotes is not None and not quotes.empty: break
+            candidate=call()
+            if candidate is not None and not candidate.empty and all(_pick(candidate, n) for n in required_names):
+                quotes=candidate; sources.append(source); break
         except Exception: continue
     if quotes is None or quotes.empty: raise MultiSourceUnavailable("新浪与东方财富公开行情均暂时不可用")
     code=_pick(quotes,"代码"); name=_pick(quotes,"名称"); change=_pick(quotes,"涨跌幅"); amount=_pick(quotes,"成交额"); turnover=_pick(quotes,"换手率"); mv=_pick(quotes,"总市值"); high=_pick(quotes,"最高"); low=_pick(quotes,"最低"); price=_pick(quotes,"最新价")

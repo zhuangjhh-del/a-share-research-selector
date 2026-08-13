@@ -3,7 +3,7 @@ name: Daily post-market research
 on:
   schedule:
     # 14:35 Asia/Shanghai = 06:35 UTC；实时数据源缺失时安全停机。
-    - cron: '35,38,41 6 * * 1-5'
+    - cron: '35 6 * * 1-5'
   workflow_dispatch:
     inputs:
       as_of:
@@ -30,7 +30,7 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Generate results with retries
         env:
-          MARKET_DATA_URL: ${{ secrets.MARKET_DATA_URL }}
+          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
         run: |
           for attempt in 1 2 3; do
             python -m services.selector.run ${{ inputs.as_of && format('--as-of {0}', inputs.as_of) || '' }} && break

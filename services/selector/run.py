@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from services.selector.calendar import is_trading_day
-from services.selector.providers.eastmoney_public import PublicFeedUnavailable, fetch_market_snapshot
+from services.selector.providers.tushare import TushareNotConfigured, fetch_tushare_snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / "apps" / "site"
@@ -29,13 +29,13 @@ def main() -> None:
         write_status(day, "skipped", "非交易日，不执行盘后选股")
         return
     try:
-        snapshot = fetch_market_snapshot()
-    except PublicFeedUnavailable as exc:
+        snapshot = fetch_tushare_snapshot()
+    except TushareNotConfigured as exc:
         publish_blocked(day, str(exc))
-        logging.warning("public feed unavailable: %s", exc)
+        logging.warning("Tushare unavailable: %s", exc)
         return
-    (DATA / "last_market_snapshot.json").write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
-    publish_blocked(day, "公开行情已获取，但八层策略关键字段未齐全，今日不发布推荐。", snapshot)
+    (DATA / "last_tushare_snapshot.json").write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+    publish_blocked(day, "Tushare 已连通；当前账户权限尚未验证八层策略所需盘中字段，今日不发布推荐。", snapshot)
 
 
 def publish_blocked(day: date, message: str, snapshot: dict | None = None) -> None:
@@ -43,10 +43,10 @@ def publish_blocked(day: date, message: str, snapshot: dict | None = None) -> No
         "asOf": day.isoformat(),
         "updatedAt": datetime.now(SHANGHAI).isoformat(timespec="seconds"),
         "status": "blocked",
-        "mode": "免费公开数据研究版（14:35 尽力而为）",
+        "mode": "Tushare 数据模式（待验证权限）",
         "strategy": {"version": "eight-layer-v1", "description": "八层策略；关键实时字段不全时不发布推荐。"},
-        "source": "东方财富公开数据（AKShare）",
-        "message": message + "（免费公开数据源仅供研究，不保证实时性或可用性。）",
+        "source": "Tushare API",
+        "message": message,
         "marketSnapshot": snapshot,
         "results": [],
     }

@@ -1,14 +1,14 @@
 {
   "asOf": "2026-08-13",
-  "updatedAt": "2026-08-13T19:59:55+08:00",
+  "updatedAt": "2026-08-13T20:26:39+08:00",
   "status": "blocked",
-  "mode": "Tushare 数据模式（待验证权限）",
+  "mode": "免费多源公开数据研究版",
   "strategy": {
     "version": "eight-layer-v1",
     "description": "八层策略；关键实时字段不全时不发布推荐。"
   },
-  "source": "Tushare API",
-  "message": "Tushare 基础接口调用失败（抱歉，您没有接口(trade_cal)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。）",
+  "source": "免费多源公开数据",
+  "message": "公开行情缺少基础筛选字段",
   "marketSnapshot": null,
   "results": []
 }

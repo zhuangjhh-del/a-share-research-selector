@@ -23,7 +23,8 @@ def fetch_tushare_snapshot() -> dict:
         # purchased permissions and must be mapped after a successful test call.
         calendar = pro.trade_cal(exchange="SSE", is_open="1", limit=1)
     except Exception as exc:
-        raise TushareNotConfigured("Tushare 连接或账户权限不可用") from exc
+        # Safe diagnostic only: exception class, never token or request headers.
+        raise TushareNotConfigured(f"Tushare 基础接口调用失败（{type(exc).__name__}）") from exc
     if calendar is None or calendar.empty:
         raise TushareNotConfigured("Tushare 未返回有效交易日历数据")
     return {

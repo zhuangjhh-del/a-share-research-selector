@@ -1,8 +1,8 @@
 [
   {
     "asOf": "2026-08-13",
-    "count": 0,
-    "strategyVersion": "eight-layer-v1",
-    "status": "blocked"
+    "count": 5,
+    "strategyVersion": "multi-source-basic-v1",
+    "status": "partial"
   }
 ]

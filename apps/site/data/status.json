@@ -1,5 +1,5 @@
 {
   "asOf": "2026-08-13",
-  "status": "blocked",
-  "message": "新浪与东方财富公开行情均暂时不可用"
+  "status": "partial",
+  "message": "基础多源候选：5 只"
 }

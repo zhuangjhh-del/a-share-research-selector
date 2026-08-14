@@ -1,5 +1,11 @@
 [
   {
+    "asOf": "2026-08-14",
+    "count": 5,
+    "strategyVersion": "multi-source-basic-v1",
+    "status": "partial"
+  },
+  {
     "asOf": "2026-08-13",
     "count": 5,
     "strategyVersion": "multi-source-basic-v1",

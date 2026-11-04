@@ -1,5 +1,11 @@
 [
   {
+    "asOf": "2026-11-04",
+    "count": 0,
+    "strategyVersion": "eight-layer-v1",
+    "status": "blocked"
+  },
+  {
     "asOf": "2026-11-03",
     "count": 5,
     "strategyVersion": "multi-source-basic-v1",
